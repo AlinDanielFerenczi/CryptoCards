@@ -8,12 +8,15 @@ contract CardFactory is Ownable {
   using SafeMath32 for uint32;
   using SafeMath16 for uint16;
 
-  event NewCard(uint cardId, string name, string description, uint32 mana, uint32 set, uint256 releaseDate);
+  event NewCard(uint cardId, string name, string description, uint32 mana,
+                uint32 health, uint32 attack, uint32 set, uint256 releaseDate);
 
   struct Card {
     string name;
     string description;
     uint32 mana;
+    uint32 health;
+    uint32 attack;
     uint32 set;
     uint256 releaseDate;
   }
@@ -23,10 +26,11 @@ contract CardFactory is Ownable {
   mapping (uint => address) public cardToOwner;
   mapping (address => uint) ownerCardCount;
 
-  function _createCard(string memory _name, string memory _description, uint32 _mana, uint32 _set, uint256 _releaseDate) internal {
-    uint id = cards.push(Card(_name, _description, _mana, _set, _releaseDate));
+  function _createCard(string memory _name, string memory _description, uint32 _mana,
+                       uint32 _health, uint32 _attack, uint32 _set, uint256 _releaseDate) internal {
+    uint id = cards.push(Card(_name, _description, _mana, _health, _attack, _set, _releaseDate));
     cardToOwner[id] = msg.sender;
     ownerCardCount[msg.sender] = ownerCardCount[msg.sender].add(1);
-    emit NewCard(id, _name, _description, _mana, _set, _releaseDate);
+    emit NewCard(id, _name, _description, _mana, _health, _attack, _set, _releaseDate);
   }
 }
