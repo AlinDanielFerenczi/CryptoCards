@@ -14,18 +14,20 @@ contract CardBattle is CardOwnership {
     DRAW
   }
 
-  function ceil(uint32 a, uint32 b) internal pure returns (uint32) {
-    return ((a + b - 1) / b) * b;
+  function _ceil(uint32 a, uint32 b) public pure returns (uint32) {
+    return b == 0 ?
+        0 :
+        (a / b) + (a % b == 0 ? 0 : 1);
   }
 
-  function battle(uint _playerCardId, uint _enemyCardId) public
+  function battle(uint _playerCardId, uint _enemyCardId) external
     onlyOwnerOf(_playerCardId) {
     // cards alternate in attacking eachother until the health of one reaches 0
-    uint32 playerTurnsToWin = ceil(cards[_enemyCardId].health, cards[_playerCardId].attack);
-    uint32 enemyTurnsToWin = ceil(cards[_playerCardId].health, cards[_enemyCardId].attack);
+    uint32 playerTurnsToWin = _ceil(cards[_enemyCardId].health, cards[_playerCardId].attack);
+    uint32 enemyTurnsToWin = _ceil(cards[_playerCardId].health, cards[_enemyCardId].attack);
     BattleOutcome outcome = playerTurnsToWin == enemyTurnsToWin ?
                                 BattleOutcome.DRAW :
-                                playerTurnsToWin < enemyTurnsToWin ?
+                                playerTurnsToWin < enemyTurnsToWin && playerTurnsToWin != 0 || enemyTurnsToWin == 0 ?
                                 BattleOutcome.WIN :
                                 BattleOutcome.LOSS;
     emit BattleOver(_playerCardId, _enemyCardId, outcome);
